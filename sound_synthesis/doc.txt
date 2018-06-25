@@ -1,0 +1,180 @@
+1. Thesis
+https://deepmind.com/blog/wavenet-generative-model-raw-audio/     2016/9/8
+https://google.github.io/tacotron/
+
+
+2. Github code
+https://r9y9.github.io/wavenet_vocoder/
+https://github.com/r9y9/wavenet_vocoder/blob/master/train.py
+https://github.com/r9y9/Tacotron-2
+
+https://github.com/Rayhane-mamah/Tacotron-2
+
+https://github.com/NVIDIA/tacotron2
+
+
+3.
+https://sites.google.com/site/shinnosuketakamichi/publication/jsut
+
+https://www.nii.ac.jp/dsc/idr/en/speech/speech.html
+https://www.ninjal.ac.jp/english/database/
+
+https://github.com/begeekmyfriend/Tacotron-2/tree/mandarin
+
+
+4. study website
+https://morvanzhou.github.io/
+
+
+
+THCHS30
+
+pip3 install tensorflow
+
+
+pip install --ignore-installed --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl
+
+
+source activate tensorflow
+source deactivate
+
+npy file
+
+hparams
+checkpoint_path
+
+active
+source activate tensorflow
+
+
+https://github.com/whyky/wavenet_vocoder.git
+
+
+wavenet_vocoder
+1. preprocess: create mel_spectrogram from wav audio file   
+python preprocess.py --preset=presets/ljspeech_mixture.json ljspeech ./data/LJSpeech-1.1 ./data/LJSpeech-1.1
+
+python preprocess.py --preset=presets/ljspeech_mixture.json ljspeech ../data/LJSpeech-1.1 ./data/LJSpeech-1.1
+
+
+ljspeech ~/data/LJSpeech-1.1
+tar -xvjf enginsxt.tar.bz2
+
+
+2. training model : create checkpoint_stepxxxx.pth and  checkpoint_stepxxx_ema.pth file   
+python train.py --preset=presets/ljspeech_mixture.json --data-root=./data/LJSpeech-1.1
+
+3. Systhesis:  what this do ???   Synthesis waveform from trained WaveNet.
+python synthesis.py ${checkpoint_path} ${output_dir} --preset=<json> --hparams="parameters you want to override"
+
+python synthesis.py --hparams="parameters you want to override" \
+    checkpoints_awb/checkpoint_step000100000.pth \
+    generated/test_awb \
+    --conditional=./data/cmu_arctic/cmu_arctic-mel-00001.npy
+
+python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb  
+
+python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb --conditional=./data//LJSpeech-1.1/ljspeech-mel-13100.npy
+
+
+
+from code
+output_device: GPU location of the output  Use -1 to indicate the CPU.
+
+
+dataSet:
+# (x,c,g)
+
+return raw_audio, mel, speaker_id
+
+
+hparams.input_type == raw
+
+
+discretized_mix_logistic_loss
+
+nn.Module
+model = build_model().to(device)
+
+https://pytorch.org/docs/master/_modules/torch/nn/modules/module.html#Module
+
+module(*inputs[0], **module_kwargs[0])
+
+        B (int): Batch size.
+        T (int): Time length.
+        g (Tensor): Global features, (B x C) or (B x C x 1).
+        bct (bool) : returns (B x C x T) if True, otherwise (B x T x C)
+
+
+
+for step, (x, y, c, g, input_lengths) in tqdm(enumerate(data_loader)):
+
+# ???                 
+x = raw_audio
+c = mel
+g = speaker_id  
+
+torch.utils.data  as   data_utils
+
+https://pytorch.org/docs/stable/_modules/torch/utils/data/dataloader.html#DataLoader
+
+x, y, c, g, input_lengths
+
+
+raw_audio                    mel            speaker  
+
+x[0] (B,T,C)   x[0] (B,T)    x[1](B,T,D)    x[2]
+x_batch,       y_batch,      c_batch,       g_batch,     input_lengths
+
+x,             y,            c,             g,           input_lengths
+
+y_hat = torch.nn.parallel.data_parallel(model, (x, c, g, False))
+
+
+
+Bug1: cpu only problem
+modified train.py
+
+   if use_cuda:
+        # multi gpu support
+        # you must make sure that batch size % num gpu == 0
+    	y_hat = torch.nn.parallel.data_psarallel(model, (x, c, g, False))
+    else:
+        y_hat = model(x, c, g, False) 
+ 
+Bug2:
+
+Traceback (most recent call last):
+  File "train.py", line 974, in <module>
+    checkpoint_dir=checkpoint_dir)
+  File "train.py", line 705, in train_loop
+    for step, (x, y, c, g, input_lengths) in tqdm(enumerate(data_loader)):
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/site-packages/torch/utils/data/dataloader.py", line 451, in __iter__
+    return _DataLoaderIter(self)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/site-packages/torch/utils/data/dataloader.py", line 239, in __init__
+    w.start()
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/process.py", line 105, in start
+    self._popen = self._Popen(self)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/context.py", line 212, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/context.py", line 267, in _Popen
+    return Popen(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/popen_fork.py", line 20, in __init__
+    self._launch(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/popen_fork.py", line 67, in _launch
+    self.pid = os.fork()
+OSError: [Errno 12] Cannot allocate memory
+(tensorflow) kouyouyanobu@ubuntu-hadoop:~/whyky/wavenet_vocoder$ 
+
+
+batch_size or max_time_steps
+
+
+
+https://github.com/whyky/Tacotron-2
+
+1. download dataset
+2. preprocess data
+3. train Tacontron model
+4. Synthesize/Evaluate the Tacontron model
+
