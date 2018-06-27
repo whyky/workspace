@@ -1,0 +1,19 @@
+for root, dirs, files in os.walk(path):
+     for dir in dirs
+
+
+
+Added/modified the following two files for jsut corpus
+
+new file:   jsut.py
+modified:   preprocess.py
+
+
+
+
+for root,dirs,files in os.walk(stuff):
+    if root[len(stuff)+1:].count(os.sep)<2:
+        for f in files:
+            print(os.path.join(root,f))
+
+
