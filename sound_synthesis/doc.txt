@@ -170,6 +170,32 @@ OSError: [Errno 12] Cannot allocate memory
 batch_size or max_time_steps
 
 
+Bug3
+
+7356it [61:14:43, 29.92s/it]
+Step 7356 [train] Loss: 8.274605823055825
+Saved checkpoint: checkpoints/checkpoint_step000007356.pth
+Traceback (most recent call last):
+  File "train.py", line 975, in <module>
+    checkpoint_dir=checkpoint_dir)
+  File "train.py", line 705, in train_loop
+    for step, (x, y, c, g, input_lengths) in tqdm(enumerate(data_loader)):
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/site-packages/torch/utils/data/dataloader.py", line 451, in __iter__
+    return _DataLoaderIter(self)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/site-packages/torch/utils/data/dataloader.py", line 239, in __init__
+    w.start()
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/process.py", line 105, in start
+    self._popen = self._Popen(self)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/context.py", line 212, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/context.py", line 267, in _Popen
+    return Popen(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/popen_fork.py", line 20, in __init__
+    self._launch(process_obj)
+  File "/home/kouyouyanobu/anaconda3/envs/tensorflow/lib/python3.5/multiprocessing/popen_fork.py", line 67, in _launch
+    self.pid = os.fork()
+OSError: [Errno 12] Cannot allocate memory
+
 
 https://github.com/whyky/Tacotron-2
 
