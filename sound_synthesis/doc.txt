@@ -57,6 +57,12 @@ python preprocess.py --preset=presets/ljspeech_mixture.json ljspeech ./data/LJSp
 python preprocess.py --preset=presets/ljspeech_mixture.json ljspeech ../data/LJSpeech-1.1 ./data/LJSpeech-1.1
 
 
+python preprocess.py --preset=presets/ljspeech_mixture.json jsut ../data/jsut_ver1.1 ./data/jsut_ver1.1
+
+
+
+
+
 ljspeech ~/data/LJSpeech-1.1
 tar -xvjf enginsxt.tar.bz2
 
@@ -72,9 +78,38 @@ python synthesis.py --hparams="parameters you want to override" \
     generated/test_awb \
     --conditional=./data/cmu_arctic/cmu_arctic-mel-00001.npy
 
+not work
 python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb  
 
 python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb --conditional=./data//LJSpeech-1.1/ljspeech-mel-13100.npy
+
+
+wavenet_vocoder for jsut
+1. preprocess: create mel_spectrogram from wav audio file   
+python preprocess.py --preset=presets/jsut.json jsut ../data/jsut_ver1.1 ./data/jsut_ver1.1
+
+
+2. training model : create checkpoint_stepxxxx.pth and  checkpoint_stepxxx_ema.pth file
+python train.py --preset=presets/jsut.json --data-root=./data/jsut_ver1.1
+
+
+3. Systhesis:  what this do ???   Synthesis waveform from trained WaveNet.
+python synthesis.py ${checkpoint_path} ${output_dir} --preset=<json> --hparams="parameters you want to override"
+
+python synthesis.py --hparams="parameters you want to override" \
+    checkpoints_awb/checkpoint_step000100000.pth \
+    generated/test_awb \
+    --conditional=./data/cmu_arctic/cmu_arctic-mel-00001.npy
+
+not work
+python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb  
+
+python synthesis.py --preset=presets/ljspeech_mixture.json ./checkpoints/checkpoint_step000010000.pth ./generated/test_awb --conditional=./data//LJSpeech-1.1/ljspeech-mel-13100.npy
+
+
+
+
+
 
 
 
